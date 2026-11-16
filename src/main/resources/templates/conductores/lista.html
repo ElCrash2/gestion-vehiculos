@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Conductores · Gestión de vehículos</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: bar}"></div>
+<main class="container">
+  <div class="page-title"><h1>Conductores</h1><a class="button" th:if="${admin}" th:href="@{/conductores/nuevo}">Añadir conductor</a></div>
+  <div th:if="${mensaje}" class="notice" th:text="${mensaje}"></div>
+  <div th:if="${error}" class="notice error" th:text="${error}"></div>
+  <section class="panel">
+    <form class="grid" method="get" th:action="@{/conductores}">
+      <div class="field">
+        <label for="q">Buscar nombre o teléfono</label>
+        <input id="q" name="q" th:value="${consulta}">
+      </div>
+      <div class="field">
+        <label for="departamentoFiltro">Departamento</label>
+        <select id="departamentoFiltro" name="departamento">
+          <option value="">Todos</option>
+          <option th:each="departamento : ${departamentos}" th:value="${departamento}" th:text="${departamento.etiqueta}" th:selected="${departamento == departamentoSeleccionado}"></option>
+        </select>
+      </div>
+      <div class="actions">
+        <button class="button secondary" type="submit">Filtrar</button>
+        <a class="button secondary" th:href="@{/conductores}">Limpiar</a>
+      </div>
+    </form>
+  </section>
+  <section class="panel table-wrap">
+    <table>
+      <thead><tr><th>Nombre</th><th>Departamento</th><th>Teléfono</th><th th:if="${admin}">Acciones</th></tr></thead>
+      <tbody>
+      <tr th:each="conductor : ${conductores}">
+        <td th:text="${conductor.nombre}"></td>
+        <td th:text="${conductor.departamento.etiqueta}"></td>
+        <td th:text="${conductor.telefono ?: '—'}"></td>
+        <td th:if="${admin}">
+          <div class="actions">
+            <a class="button secondary" th:href="@{/conductores/{id}/editar(id=${conductor.id})}">Editar</a>
+            <form th:action="@{/conductores/{id}/eliminar(id=${conductor.id})}" method="post">
+              <button class="button danger" type="submit">Eliminar</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      <tr th:if="${#lists.isEmpty(conductores)}"><td class="empty" colspan="4">No hay conductores registrados.</td></tr>
+      </tbody>
+    </table>
+  </section>
+</main>
+</body>
+</html>

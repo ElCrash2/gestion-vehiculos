@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<header class="topbar" th:fragment="bar">
+  <a class="brand" th:href="@{/app}">Gestión de vehículos</a>
+  <nav class="nav" aria-label="Navegación principal">
+    <a th:href="@{/app}">Inicio</a>
+    <a th:href="@{/vehiculos}">Vehículos</a>
+    <a th:href="@{/conductores}">Conductores</a>
+    <a th:href="@{/asignaciones}">Asignaciones</a>
+    <a th:if="${admin}" th:href="@{/usuarios}">Usuarios</a>
+    <form th:action="@{/logout}" method="post">
+      <button class="logout" type="submit">Cerrar sesión</button>
+    </form>
+  </nav>
+</header>
+</body>
+</html>

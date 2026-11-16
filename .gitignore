@@ -1,0 +1,7 @@
+target/*
+!target/.gitkeep
+.idea/
+*.iml
+.vscode/
+Dockerfile.tmp
+secrets/

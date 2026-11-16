@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vehículo · Gestión de vehículos</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: bar}"></div>
+<main class="container">
+  <h1 th:text="${vehiculo.id == null ? 'Nuevo vehículo' : 'Editar vehículo'}">Vehículo</h1>
+  <section class="panel">
+    <form th:object="${vehiculo}" th:action="${vehiculo.id == null} ? @{/vehiculos} : @{/vehiculos/{id}(id=${vehiculo.id})}" method="post">
+      <div class="field">
+        <label for="matricula">Matrícula</label>
+        <input id="matricula" th:field="*{matricula}" maxlength="20" required>
+        <div class="error-text" th:errors="*{matricula}"></div>
+      </div>
+      <div class="field">
+        <label for="modelo">Modelo</label>
+        <input id="modelo" th:field="*{modelo}" maxlength="100">
+        <div class="error-text" th:errors="*{modelo}"></div>
+      </div>
+      <div class="field">
+        <label for="kilometraje">Kilometraje</label>
+        <input id="kilometraje" type="number" min="0" th:field="*{kilometraje}" required>
+        <div class="error-text" th:errors="*{kilometraje}"></div>
+      </div>
+      <div class="field">
+        <label for="estado">Estado</label>
+        <select id="estado" th:field="*{estado}" required>
+          <option th:each="estado : ${estadosVehiculo}" th:value="${estado}" th:text="${estado}"></option>
+        </select>
+      </div>
+      <div class="actions">
+        <button class="button" type="submit">Guardar</button>
+        <a class="button secondary" th:href="@{/vehiculos}">Cancelar</a>
+      </div>
+    </form>
+  </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Usuarios · Gestión de vehículos</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: bar}"></div>
+<main class="container">
+  <div class="page-title"><h1>Usuarios</h1></div>
+  <div th:if="${mensaje}" class="notice" th:text="${mensaje}"></div>
+  <div th:if="${error}" class="notice error" th:text="${error}"></div>
+
+  <section class="panel">
+    <h2>Crear usuario</h2>
+    <form th:action="@{/usuarios}" th:object="${usuarioForm}" method="post">
+      <div class="grid">
+        <div class="field">
+          <label for="username">Nombre de usuario</label>
+          <input id="username" th:field="*{username}" maxlength="50" autocomplete="off" required>
+          <div class="error-text" th:errors="*{username}"></div>
+        </div>
+        <div class="field">
+          <label for="password">Contraseña (mínimo 8 caracteres)</label>
+          <input id="password" th:field="*{password}" type="password" minlength="8" maxlength="72" required>
+          <div class="error-text" th:errors="*{password}"></div>
+        </div>
+        <div class="field">
+          <label for="rol">Rol</label>
+          <select id="rol" th:field="*{rol}" required>
+            <option th:each="rol : ${roles}" th:value="${rol}" th:text="${rol}"></option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="conductorId">Conductor asociado (opcional)</label>
+          <select id="conductorId" th:field="*{conductorId}">
+            <option value="">Sin conductor</option>
+            <option th:each="conductor : ${conductores}" th:value="${conductor.id}" th:text="${conductor.nombre}"></option>
+          </select>
+        </div>
+      </div>
+      <button class="button" type="submit">Crear cuenta</button>
+    </form>
+  </section>
+
+  <section class="panel table-wrap">
+    <h2>Cuentas existentes</h2>
+    <table>
+      <thead><tr><th>Usuario</th><th>Rol y conductor</th><th>Cambiar contraseña</th><th>Acciones</th></tr></thead>
+      <tbody>
+      <tr th:each="usuario : ${usuarios}">
+        <td>
+          <form th:id="${'update-' + usuario.id}" th:action="@{/usuarios/{id}(id=${usuario.id})}" method="post"></form>
+          <strong th:text="${usuario.username}"></strong>
+          <div class="muted" th:if="${usuario.conductor != null}"
+               th:text="${'Conductor #' + usuario.conductor.id}"></div>
+        </td>
+        <td>
+          <div class="inline-form">
+            <select name="rol" th:attr="form=${'update-' + usuario.id}" aria-label="Rol">
+              <option th:each="rol : ${roles}" th:value="${rol}" th:text="${rol}" th:selected="${rol == usuario.rol}"></option>
+            </select>
+            <select name="conductorId" th:attr="form=${'update-' + usuario.id}" aria-label="Conductor asociado">
+              <option value="">Sin conductor</option>
+              <option th:each="conductor : ${conductores}" th:value="${conductor.id}"
+                      th:text="${conductor.nombre}"
+                      th:selected="${usuario.conductor != null and conductor.id == usuario.conductor.id}"></option>
+            </select>
+          </div>
+        </td>
+        <td><input name="password" th:attr="form=${'update-' + usuario.id}" type="password" minlength="8" maxlength="72" placeholder="Vacío = no cambiar"></td>
+        <td>
+          <div class="actions">
+            <button class="button" th:attr="form=${'update-' + usuario.id}" type="submit">Guardar</button>
+            <form th:action="@{/usuarios/{id}/eliminar(id=${usuario.id})}" method="post">
+              <button class="button danger" type="submit">Eliminar</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      <tr th:if="${#lists.isEmpty(usuarios)}"><td class="empty" colspan="4">No hay usuarios registrados.</td></tr>
+      </tbody>
+    </table>
+  </section>
+</main>
+</body>
+</html>

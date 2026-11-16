@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Conductor · Gestión de vehículos</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: bar}"></div>
+<main class="container">
+  <h1 th:text="${conductor.id == null ? 'Nuevo conductor' : 'Editar conductor'}">Conductor</h1>
+  <section class="panel">
+    <form th:object="${conductor}" th:action="${conductor.id == null} ? @{/conductores} : @{/conductores/{id}(id=${conductor.id})}" method="post">
+      <div class="field">
+        <label for="nombre">Nombre</label>
+        <input id="nombre" th:field="*{nombre}" maxlength="100" required>
+        <div class="error-text" th:errors="*{nombre}"></div>
+      </div>
+      <div class="field">
+        <label for="departamento">Departamento</label>
+        <select id="departamento" th:field="*{departamento}" required>
+          <option value="">Selecciona un departamento</option>
+          <option th:each="departamento : ${departamentos}" th:value="${departamento}" th:text="${departamento.etiqueta}"></option>
+        </select>
+        <div class="error-text" th:errors="*{departamento}"></div>
+      </div>
+      <div class="field">
+        <label for="telefono">Teléfono</label>
+        <input id="telefono" th:field="*{telefono}" maxlength="20">
+        <div class="error-text" th:errors="*{telefono}"></div>
+      </div>
+      <div class="actions">
+        <button class="button" type="submit">Guardar</button>
+        <a class="button secondary" th:href="@{/conductores}">Cancelar</a>
+      </div>
+    </form>
+  </section>
+</main>
+</body>
+</html>

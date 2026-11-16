@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vehículos · Gestión de vehículos</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: bar}"></div>
+<main class="container">
+  <div class="page-title"><h1>Vehículos</h1><a class="button" th:if="${admin}" th:href="@{/vehiculos/nuevo}">Añadir vehículo</a></div>
+  <div th:if="${mensaje}" class="notice" th:text="${mensaje}"></div>
+  <div th:if="${error}" class="notice error" th:text="${error}"></div>
+  <section class="panel">
+    <form class="grid" method="get" th:action="@{/vehiculos}">
+      <div class="field">
+        <label for="q">Buscar matrícula o modelo</label>
+        <input id="q" name="q" th:value="${consulta}">
+      </div>
+      <div class="field">
+        <label for="estadoFiltro">Estado</label>
+        <select id="estadoFiltro" name="estado">
+          <option value="">Todos</option>
+          <option th:each="estado : ${estadosVehiculo}" th:value="${estado}" th:text="${estado}" th:selected="${estado == estadoSeleccionado}"></option>
+        </select>
+      </div>
+      <div class="actions">
+        <button class="button secondary" type="submit">Filtrar</button>
+        <a class="button secondary" th:href="@{/vehiculos}">Limpiar</a>
+      </div>
+    </form>
+  </section>
+  <section class="panel table-wrap">
+    <table>
+      <thead><tr><th>Matrícula</th><th>Modelo</th><th>Kilometraje</th><th>Estado</th><th th:if="${admin}">Acciones</th></tr></thead>
+      <tbody>
+      <tr th:each="vehiculo : ${vehiculos}">
+        <td th:text="${vehiculo.matricula}"></td>
+        <td th:text="${vehiculo.modelo ?: '—'}"></td>
+        <td th:text="${vehiculo.kilometraje}"></td>
+        <td><span class="badge" th:text="${vehiculo.estado}"></span></td>
+        <td th:if="${admin}">
+          <div class="actions">
+            <a class="button secondary" th:href="@{/vehiculos/{id}/editar(id=${vehiculo.id})}">Editar</a>
+            <form th:action="@{/vehiculos/{id}/eliminar(id=${vehiculo.id})}" method="post">
+              <button class="button danger" type="submit">Eliminar</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      <tr th:if="${#lists.isEmpty(vehiculos)}"><td class="empty" colspan="5">No hay vehículos registrados.</td></tr>
+      </tbody>
+    </table>
+  </section>
+</main>
+</body>
+</html>

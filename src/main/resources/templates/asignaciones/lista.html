@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Asignaciones · Gestión de vehículos</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: bar}"></div>
+<main class="container">
+  <div class="page-title"><h1>Asignaciones</h1></div>
+  <div th:if="${mensaje}" class="notice" th:text="${mensaje}"></div>
+  <div th:if="${error}" class="notice error" th:text="${error}"></div>
+
+  <section class="panel">
+    <h2>Nueva asignación</h2>
+    <form th:action="@{/asignaciones}" th:object="${asignacionForm}" method="post">
+      <div class="grid">
+        <div class="field">
+          <label for="conductorId">Conductor</label>
+          <select id="conductorId" th:field="*{conductorId}" required>
+            <option value="">Selecciona un conductor</option>
+            <option th:each="conductor : ${conductores}" th:value="${conductor.id}" th:text="${conductor.nombre}"></option>
+          </select>
+          <div class="error-text" th:errors="*{conductorId}"></div>
+        </div>
+        <div class="field">
+          <label for="vehiculoId">Vehículo disponible</label>
+          <select id="vehiculoId" th:field="*{vehiculoId}" required>
+            <option value="">Selecciona un vehículo</option>
+            <option th:each="vehiculo : ${vehiculosDisponibles}" th:value="${vehiculo.id}" th:text="${vehiculo.matricula + ' · ' + vehiculo.kilometraje + ' km'}"></option>
+          </select>
+          <div class="error-text" th:errors="*{vehiculoId}"></div>
+        </div>
+        <div class="field">
+          <label for="motivo">Motivo</label>
+          <select id="motivo" th:field="*{motivo}" required>
+            <option value="">Selecciona un motivo</option>
+            <option th:each="motivo : ${motivos}" th:value="${motivo}" th:text="${motivo.etiqueta}"></option>
+          </select>
+          <div class="error-text" th:errors="*{motivo}"></div>
+        </div>
+        <div class="field">
+          <label for="fechaSalida">Fecha de salida (opcional)</label>
+          <input id="fechaSalida" type="datetime-local" th:field="*{fechaSalida}">
+        </div>
+        <div class="field">
+          <label for="fechaPrevistaRegreso">Regreso previsto</label>
+          <input id="fechaPrevistaRegreso" type="datetime-local" th:field="*{fechaPrevistaRegreso}" required>
+          <div class="error-text" th:errors="*{fechaPrevistaRegreso}"></div>
+        </div>
+      </div>
+      <button class="button" type="submit">Crear asignación</button>
+    </form>
+    <p class="muted">Solo aparecen vehículos disponibles. La retención del histórico es de <span th:text="${retencionDias}">365</span> días.</p>
+  </section>
+
+  <section class="panel">
+    <form class="actions" method="get" th:action="@{/asignaciones}">
+      <label for="filtroEstado">Filtrar por estado</label>
+      <select id="filtroEstado" name="estado">
+        <option value="">Todos</option>
+        <option th:each="estado : ${estadosAsignacion}" th:value="${estado}" th:text="${estado}" th:selected="${estado == estadoSeleccionado}"></option>
+      </select>
+      <button class="button secondary" type="submit">Filtrar</button>
+      <a class="button secondary" th:href="@{/asignaciones}">Limpiar</a>
+    </form>
+  </section>
+
+  <section class="panel table-wrap">
+    <table>
+      <thead><tr><th>Conductor</th><th>Vehículo</th><th>Motivo</th><th>Salida</th><th>Regreso previsto</th><th>Estado</th><th>Kilómetros</th><th>Acciones</th></tr></thead>
+      <tbody>
+      <tr th:each="asignacion : ${asignaciones}">
+        <td th:text="${asignacion.conductorNombre}"></td>
+        <td th:text="${asignacion.vehiculoMatricula}"></td>
+        <td th:text="${asignacion.motivo.etiqueta}"></td>
+        <td th:text="${#temporals.format(asignacion.fechaSalida, 'dd/MM/yyyy HH:mm')}"></td>
+        <td th:text="${#temporals.format(asignacion.fechaPrevistaRegreso, 'dd/MM/yyyy HH:mm')}"></td>
+        <td><span class="badge" th:classappend="${asignacion.estadoAsignacion.name() == 'ACTIVA'} ? ' info' : ''" th:text="${asignacion.estadoAsignacion}"></span></td>
+        <td th:text="${asignacion.kmSalida + ' → ' + (asignacion.kmRegreso == null ? '—' : asignacion.kmRegreso)}"></td>
+        <td>
+          <form class="inline-form" th:if="${asignacion.estadoAsignacion.name() == 'ACTIVA'}"
+                th:action="@{/asignaciones/{id}/finalizar(id=${asignacion.id})}" method="post">
+            <input name="kmRegreso" type="number" min="0" th:min="${asignacion.kmSalida}" placeholder="Km regreso" required>
+            <input name="fechaRegresoReal" type="datetime-local">
+            <button class="button" type="submit">Finalizar</button>
+          </form>
+          <form th:if="${admin and asignacion.estadoAsignacion.name() == 'FINALIZADA'}"
+                th:action="@{/asignaciones/{id}/eliminar(id=${asignacion.id})}" method="post">
+            <button class="button danger" type="submit">Eliminar</button>
+          </form>
+        </td>
+      </tr>
+      <tr th:if="${#lists.isEmpty(asignaciones)}"><td class="empty" colspan="8">No hay asignaciones para mostrar.</td></tr>
+      </tbody>
+    </table>
+  </section>
+  <form th:if="${admin}" th:action="@{/asignaciones/depurar}" method="post">
+    <button class="button danger" type="submit">Depurar asignaciones finalizadas antiguas</button>
+  </form>
+</main>
+</body>
+</html>

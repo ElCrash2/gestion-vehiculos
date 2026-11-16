@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Inicio · Gestión de vehículos</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: bar}"></div>
+<main class="container">
+  <div class="page-title">
+    <div>
+      <h1>Panel de control</h1>
+      <p class="muted">Hola, <strong th:text="${username}">usuario</strong>. Resumen de la flota.</p>
+    </div>
+  </div>
+  <div th:if="${mensaje}" class="notice" th:text="${mensaje}"></div>
+  <div th:if="${error}" class="notice error" th:text="${error}"></div>
+  <section class="stats">
+    <article class="stat"><span class="muted">Vehículos</span><strong th:text="${totalVehiculos}">0</strong></article>
+    <article class="stat"><span class="muted">Conductores</span><strong th:text="${totalConductores}">0</strong></article>
+    <article class="stat"><span class="muted">Asignaciones activas</span><strong th:text="${asignacionesActivas}">0</strong></article>
+  </section>
+  <section class="panel">
+    <h2>Acceso rápido</h2>
+    <div class="actions">
+      <a class="button" th:href="@{/vehiculos}">Ver vehículos</a>
+      <a class="button" th:href="@{/conductores}">Ver conductores</a>
+      <a class="button" th:href="@{/asignaciones}">Gestionar asignaciones</a>
+      <a class="button secondary" th:if="${admin}" th:href="@{/usuarios}">Administrar usuarios</a>
+    </div>
+  </section>
+</main>
+</body>
+</html>
